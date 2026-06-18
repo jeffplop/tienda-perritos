@@ -6,9 +6,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 const {
-  DB_HOST = "tienda-db", // nombre del servicio interno (Service Connect en ECS)
+  DB_HOST = "tienda-db", // en ECS se inyecta el DNS del NLB interno via variable de entorno
   DB_USER = "root",
-  DB_PASSWORD = "admin123",
+  DB_PASSWORD = "", // IE5: sin password hardcodeada; se inyecta desde SSM (ECS) o el entorno
   DB_NAME = "tienda_perritos",
   DB_PORT = 3306,
 } = process.env;
