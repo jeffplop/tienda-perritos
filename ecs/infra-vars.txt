@@ -1,0 +1,11 @@
+ALB_ARN=arn:aws:elasticloadbalancing:us-east-1:471112880379:loadbalancer/app/tienda-alb/f70b01aaf676104a
+ALB_DNS=tienda-alb-1107170895.us-east-1.elb.amazonaws.com
+NLB_ARN=arn:aws:elasticloadbalancing:us-east-1:471112880379:loadbalancer/net/tienda-nlb/1f8fbfe78b545b00
+NLB_DNS=tienda-nlb-1f8fbfe78b545b00.elb.us-east-1.amazonaws.com
+TG_FRONT=arn:aws:elasticloadbalancing:us-east-1:471112880379:targetgroup/tg-frontend/11f123b2e2875612
+TG_BACK=arn:aws:elasticloadbalancing:us-east-1:471112880379:targetgroup/tg-backend/ea5b291513c82543
+TG_DB=arn:aws:elasticloadbalancing:us-east-1:471112880379:targetgroup/tg-db/685c4f1e31442933
+LISTENER=arn:aws:elasticloadbalancing:us-east-1:471112880379:listener/app/tienda-alb/f70b01aaf676104a/728a26768ffebc7d
+VPC=vpc-0b7fae2d77b4d6487
+ECS_SG=sg-0a86be9dc2a5ab13c
+ALB_SG=sg-03e5fc41b725da870

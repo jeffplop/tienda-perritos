@@ -1,0 +1,33 @@
+{
+  "family": "tienda-db",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::471112880379:role/LabRole",
+  "taskRoleArn": "arn:aws:iam::471112880379:role/LabRole",
+  "containerDefinitions": [
+    {
+      "name": "mysql",
+      "image": "471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1",
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 3306, "protocol": "tcp" }
+      ],
+      "environment": [
+        { "name": "MYSQL_DATABASE", "value": "tienda_perritos" }
+      ],
+      "secrets": [
+        { "name": "MYSQL_ROOT_PASSWORD", "valueFrom": "arn:aws:ssm:us-east-1:471112880379:parameter/tienda/db_password" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/tienda-db",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

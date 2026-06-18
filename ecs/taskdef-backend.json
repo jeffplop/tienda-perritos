@@ -1,0 +1,36 @@
+{
+  "family": "tienda-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::471112880379:role/LabRole",
+  "taskRoleArn": "arn:aws:iam::471112880379:role/LabRole",
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:v1",
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 3001, "protocol": "tcp" }
+      ],
+      "environment": [
+        { "name": "DB_HOST", "value": "tienda-nlb-1f8fbfe78b545b00.elb.us-east-1.amazonaws.com" },
+        { "name": "DB_USER", "value": "root" },
+        { "name": "DB_NAME", "value": "tienda_perritos" },
+        { "name": "DB_PORT", "value": "3306" }
+      ],
+      "secrets": [
+        { "name": "DB_PASSWORD", "valueFrom": "arn:aws:ssm:us-east-1:471112880379:parameter/tienda/db_password" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/tienda-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
