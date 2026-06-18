@@ -1,0 +1,90 @@
+name: CI/CD Tienda Perritos (ECS Fargate)
+
+# Pipeline: build -> push (ECR) -> deploy (ECS).
+# Se dispara con cada push a main, o manualmente desde la pestana Actions.
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 471112880379.dkr.ecr.us-east-1.amazonaws.com
+  ECS_CLUSTER: tienda-cluster
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      # Credenciales del Learner Lab (incluye session token, que CADUCA).
+      # Hay que actualizar los secrets del repo cada vez que se reinicia el lab.
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login a Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Definir tag de imagen (primeros 7 del SHA)
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      # ---------------- BUILD & PUSH ----------------
+      - name: Build & push FRONTEND
+        run: |
+          docker build -t $ECR_REGISTRY/tienda-frontend:$IMAGE_TAG -t $ECR_REGISTRY/tienda-frontend:latest ./frontend
+          docker push $ECR_REGISTRY/tienda-frontend:$IMAGE_TAG
+          docker push $ECR_REGISTRY/tienda-frontend:latest
+
+      - name: Build & push BACKEND
+        run: |
+          docker build -t $ECR_REGISTRY/tienda-backend:$IMAGE_TAG -t $ECR_REGISTRY/tienda-backend:latest ./backend
+          docker push $ECR_REGISTRY/tienda-backend:$IMAGE_TAG
+          docker push $ECR_REGISTRY/tienda-backend:latest
+
+      # ---------------- DEPLOY BACKEND ----------------
+      - name: Renderizar task definition BACKEND (inyecta nueva imagen)
+        id: tdback
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs/taskdef-backend.json
+          container-name: backend
+          image: ${{ env.ECR_REGISTRY }}/tienda-backend:${{ env.IMAGE_TAG }}
+
+      - name: Desplegar BACKEND en ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.tdback.outputs.task-definition }}
+          service: tienda-backend
+          cluster: tienda-cluster
+          wait-for-service-stability: true
+
+      # ---------------- DEPLOY FRONTEND ----------------
+      - name: Renderizar task definition FRONTEND (inyecta nueva imagen)
+        id: tdfront
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs/taskdef-frontend.json
+          container-name: frontend
+          image: ${{ env.ECR_REGISTRY }}/tienda-frontend:${{ env.IMAGE_TAG }}
+
+      - name: Desplegar FRONTEND en ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.tdfront.outputs.task-definition }}
+          service: tienda-frontend
+          cluster: tienda-cluster
+          wait-for-service-stability: true
+
+      - name: Resumen
+        run: |
+          echo "Despliegue completado."
+          echo "Frontend: http://tienda-alb-1107170895.us-east-1.elb.amazonaws.com"
+          echo "Imagenes con tag: $IMAGE_TAG"
