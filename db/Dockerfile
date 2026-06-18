@@ -1,11 +1,13 @@
 # Imagen base MySQL 8 oficial
 FROM mysql:8
 
-# Variables de entorno (se aplicarán automáticamente al iniciar el contenedor)
-ENV MYSQL_ROOT_PASSWORD=admin123
+# La base de datos se crea automáticamente al primer arranque.
 ENV MYSQL_DATABASE=tienda_perritos
-ENV MYSQL_USER=alumno
-ENV MYSQL_PASSWORD=alumno123
+
+# Credenciales NO hardcodeadas (IE5: gestión segura de secrets):
+#  - En ECS Fargate: MYSQL_ROOT_PASSWORD se inyecta desde AWS SSM Parameter Store
+#    (ver bloque "secrets" en ecs/taskdef-db.json).
+#  - En local / docker-compose: pasar MYSQL_ROOT_PASSWORD como variable de entorno.
 
 # Copiar el script de inicialización dentro de la imagen
 # Se ejecuta automáticamente la primera vez que se levante el contenedor
