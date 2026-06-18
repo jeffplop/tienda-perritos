@@ -1,0 +1,12 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+
+# Entorno / credenciales (NUNCA subir secretos)
+.env
+*.pem
+aws-credentials*.txt
+
+# Sistema
+.DS_Store
+Thumbs.db
