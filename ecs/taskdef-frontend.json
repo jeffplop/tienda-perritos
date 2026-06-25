@@ -4,12 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::471112880379:role/LabRole",
-  "taskRoleArn": "arn:aws:iam::471112880379:role/LabRole",
+  "executionRoleArn": "arn:aws:iam::666586747120:role/LabRole",
+  "taskRoleArn": "arn:aws:iam::666586747120:role/LabRole",
   "containerDefinitions": [
     {
       "name": "frontend",
-      "image": "471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-frontend:v1",
+      "image": "666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-frontend:v1",
       "essential": true,
       "portMappings": [
         { "containerPort": 80, "protocol": "tcp" }

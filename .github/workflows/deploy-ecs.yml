@@ -9,7 +9,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: 471112880379.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REGISTRY: 666586747120.dkr.ecr.us-east-1.amazonaws.com
   ECS_CLUSTER: tienda-cluster
 
 jobs:
@@ -86,5 +86,5 @@ jobs:
       - name: Resumen
         run: |
           echo "Despliegue completado."
-          echo "Frontend: http://tienda-alb-1107170895.us-east-1.elb.amazonaws.com"
+          echo "Frontend: http://tienda-alb-93590141.us-east-1.elb.amazonaws.com"
           echo "Imagenes con tag: $IMAGE_TAG"

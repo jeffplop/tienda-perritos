@@ -4,12 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::471112880379:role/LabRole",
-  "taskRoleArn": "arn:aws:iam::471112880379:role/LabRole",
+  "executionRoleArn": "arn:aws:iam::666586747120:role/LabRole",
+  "taskRoleArn": "arn:aws:iam::666586747120:role/LabRole",
   "containerDefinitions": [
     {
       "name": "mysql",
-      "image": "471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1",
+      "image": "666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1",
       "essential": true,
       "portMappings": [
         { "containerPort": 3306, "protocol": "tcp" }
@@ -18,7 +18,7 @@
         { "name": "MYSQL_DATABASE", "value": "tienda_perritos" }
       ],
       "secrets": [
-        { "name": "MYSQL_ROOT_PASSWORD", "valueFrom": "arn:aws:ssm:us-east-1:471112880379:parameter/tienda/db_password" }
+        { "name": "MYSQL_ROOT_PASSWORD", "valueFrom": "arn:aws:ssm:us-east-1:666586747120:parameter/tienda/db_password" }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",

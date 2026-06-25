@@ -12,7 +12,7 @@ GitHub Actions. Proyecto de la Evaluación Parcial N°3 — *Introducción a Her
                     Internet
                        │
             ┌──────────▼───────────┐
-            │   ALB público :80    │   tienda-alb-1107170895.us-east-1.elb.amazonaws.com
+            │   ALB público :80    │   tienda-alb-93590141.us-east-1.elb.amazonaws.com
             │  (Application LB)    │
             │   /        → frontend│
             │   /api/*   → backend │
@@ -56,6 +56,7 @@ GitHub Actions. Proyecto de la Evaluación Parcial N°3 — *Introducción a Her
 | `db/`       | Imagen MySQL 8 con `init.sql` (crea BD `tienda_perritos` y carga productos). |
 | `ecs/`      | Task Definitions (`taskdef-*.json`), política de autoscaling y `infra-vars.txt`. |
 | `.github/workflows/deploy-ecs.yml` | Pipeline CI/CD: build → push (ECR) → deploy (ECS). |
+| `cleanup.ps1` | Script para borrar todos los recursos AWS al terminar. |
 
 ---
 
@@ -63,11 +64,11 @@ GitHub Actions. Proyecto de la Evaluación Parcial N°3 — *Introducción a Her
 
 | Recurso | Nombre / ID |
 |---|---|
-| Región | `us-east-1` · Cuenta `471112880379` |
+| Región | `us-east-1` · Cuenta `666586747120` |
 | Repos ECR | `tienda-frontend`, `tienda-backend`, `tienda-db` |
 | Clúster ECS | `tienda-cluster` (Fargate) |
 | Servicios | `tienda-db` (1), `tienda-backend` (2→4), `tienda-frontend` (2→4) |
-| ALB público | `tienda-alb` → http://tienda-alb-1107170895.us-east-1.elb.amazonaws.com |
+| ALB público | `tienda-alb` → http://tienda-alb-93590141.us-east-1.elb.amazonaws.com |
 | NLB interno | `tienda-nlb` (TCP 3306) |
 | Security Groups | `tienda-alb-sg` (80 público), `tienda-ecs-sg` (80/3001 desde ALB, 3306 desde VPC) |
 | Secret | SSM Parameter Store `/tienda/db_password` (SecureString) |
@@ -82,15 +83,15 @@ GitHub Actions. Proyecto de la Evaluación Parcial N°3 — *Introducción a Her
 
 ```bash
 # 1) Login a ECR (en PowerShell usar -p para evitar el bug de stdin)
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 471112880379.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 666586747120.dkr.ecr.us-east-1.amazonaws.com
 
 # 2) Build & push de las 3 imágenes
-docker build -t 471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1 ./db
-docker build -t 471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:v1 ./backend
-docker build -t 471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-frontend:v1 ./frontend
-docker push 471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1
-docker push 471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:v1
-docker push 471112880379.dkr.ecr.us-east-1.amazonaws.com/tienda-frontend:v1
+docker build -t 666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1 ./db
+docker build -t 666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:v1 ./backend
+docker build -t 666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-frontend:v1 ./frontend
+docker push 666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-db:v1
+docker push 666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:v1
+docker push 666586747120.dkr.ecr.us-east-1.amazonaws.com/tienda-frontend:v1
 
 # 3) Registrar task definitions
 aws ecs register-task-definition --cli-input-json file://ecs/taskdef-db.json
@@ -101,8 +102,8 @@ aws ecs register-task-definition --cli-input-json file://ecs/taskdef-frontend.js
 #    db -> tg-db (NLB) | backend -> tg-backend (ALB) | frontend -> tg-frontend (ALB)
 ```
 
-(La creación de VPC SGs, ALB/NLB, target groups, listeners y autoscaling está en el historial
-de comandos; los IDs quedaron guardados en `ecs/infra-vars.txt`.)
+(La creación de VPC SGs, ALB/NLB, target groups, listeners y autoscaling está documentada
+en el historial de comandos; los IDs quedaron guardados en `ecs/infra-vars.txt`.)
 
 ---
 
@@ -130,7 +131,7 @@ El pipeline `.github/workflows/deploy-ecs.yml` se ejecuta en cada `push` a `main
 
 ## 6. Uso de la aplicación
 
-Abrir en el navegador: **http://tienda-alb-1107170895.us-east-1.elb.amazonaws.com**
+Abrir en el navegador: **http://tienda-alb-93590141.us-east-1.elb.amazonaws.com**
 
 - **Cargar Productos**: lista los productos (GET `/api/productos`).
 - **Guardar**: crea o actualiza (POST/PUT).
@@ -164,3 +165,4 @@ Endpoints del backend:
 | `docker login ... 400 Bad Request` | PowerShell corrompe el token por stdin | Usar `docker login -u AWS -p <token>` |
 | `ExpiredToken` | Sesión del lab caducó | Pegar credenciales nuevas en `~/.aws/credentials` |
 | `servicediscovery ... AccessDenied` | Cloud Map denegado en el lab | Usar ALB (front-back) y NLB (back-db) en vez de DNS interno |
+| `Unable to assume the service linked role` | El rol de servicio de ECS aún no existe | Reintentar `create-cluster` tras unos segundos |
