@@ -1,0 +1,22 @@
+﻿=== IE6: ANALISIS DE TIEMPOS DEL PIPELINE CI/CD (run 28144024385) ===
+Titulo: chore: migra despliegue a nueva cuenta AWS (666586747120), actualiza …
+Conclusion: success
+Inicio: 2026-06-25T03:03:42Z   Fin: 2026-06-25T03:11:57Z
+Duracion total: 495 s (8.2 min)
+----- Duracion por paso -----
+ 1. Set up job                                     [success] 2 s
+ 2. Checkout del codigo                            [success] 0 s
+ 3. Configurar credenciales AWS                    [success] 1 s
+ 4. Login a Amazon ECR                             [success] 0 s
+ 5. Definir tag de imagen (primeros 7 del SHA)     [success] 0 s
+ 6. Build & push FRONTEND                          [success] 7 s
+ 7. Build & push BACKEND                           [success] 9 s
+ 8. Renderizar task definition BACKEND (inyecta nueva imagen) [success] 0 s
+ 9. Desplegar BACKEND en ECS                       [success] 238 s
+10. Renderizar task definition FRONTEND (inyecta nueva imagen) [success] 0 s
+11. Desplegar FRONTEND en ECS                      [success] 232 s
+12. Resumen                                        [success] 0 s
+22. Post Login a Amazon ECR                        [success] 0 s
+23. Post Configurar credenciales AWS               [success] 0 s
+24. Post Checkout del codigo                       [success] 0 s
+25. Complete job                                   [success] 0 s

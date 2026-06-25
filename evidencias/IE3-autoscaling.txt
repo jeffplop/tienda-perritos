@@ -1,0 +1,180 @@
+﻿=== DEMO IE3: AUTOSCALING BAJO CARGA (backend, TargetTracking CPU 50%, min2/max4) ===
+Inicio: 06/25/2026 07:12:53
+Generador de carga: 120 hilos concurrentes GET /api/productos durante 420s (7 min)
+----- monitoreo (cada 30s) -----
+[hora] backend running/pending | ultima actividad de escalado
+[07:14:39] running=2 pending=0 | 
+[07:15:15] running=2 pending=0 | None
+[07:15:56] running=2 pending=0 | None
+[07:17:07] running=2 pending=0 | None
+[07:19:02] running=2 pending=0 | None
+[07:19:56] running=2 pending=0 | None
+[07:20:32] running=2 pending=0 | None
+[07:21:09] running=2 pending=0 | None
+[07:21:45] running=2 pending=0 | None
+[07:22:21] running=2 pending=0 | None
+[07:22:58] running=2 pending=0 | None
+[07:23:34] running=2 pending=0 | None
+[07:24:14] running=2 pending=0 | None
+[07:24:54] running=2 pending=0 | None
+[07:25:35] running=2 pending=0 | None
+[07:26:15] running=2 pending=0 | None
+[07:26:56] running=2 pending=0 | None
+[07:27:36] running=2 pending=0 | None
+----- CPU en CloudWatch (Average/Maximum por minuto) -----
+------------------------------------------------------------------------------
+|                             GetMetricStatistics                            |
++----------------------+-----------------------------+-----------------------+
+|          avg         |            hora             |          max          |
++----------------------+-----------------------------+-----------------------+
+|  0.030177040064396955|  2026-06-25T07:02:00-04:00  |  0.09334899485111237  |
+|  0.029907258305077754|  2026-06-25T07:03:00-04:00  |  0.09090176969766617  |
+|  0.031296240204634763|  2026-06-25T07:04:00-04:00  |  0.09825741499662399  |
+|  0.02941393634925286 |  2026-06-25T07:05:00-04:00  |  0.08447160571813583  |
+|  0.0373692816356197  |  2026-06-25T07:06:00-04:00  |  0.12245048582553864  |
+|  0.028000573317209877|  2026-06-25T07:07:00-04:00  |  0.0826345831155777   |
+|  0.029657876778704424|  2026-06-25T07:08:00-04:00  |  0.08986629545688629  |
+|  0.028854948623726763|  2026-06-25T07:09:00-04:00  |  0.08219411224126816  |
+|  0.030447595209504165|  2026-06-25T07:10:00-04:00  |  0.09161008149385452  |
+|  0.028205134673044086|  2026-06-25T07:11:00-04:00  |  0.08273972570896149  |
+|  0.02772822646268954 |  2026-06-25T07:12:00-04:00  |  0.08242028206586838  |
+|  34.3530960654219    |  2026-06-25T07:13:00-04:00  |  95.4953384399414     |
+|  0.07653258407178025 |  2026-06-25T07:14:00-04:00  |  0.268100768327713    |
+|  35.32744257400434   |  2026-06-25T07:15:00-04:00  |  88.3912124633789     |
+|  0.20132357502977055 |  2026-06-25T07:16:00-04:00  |  0.3934040367603302   |
+|  44.74504431088765   |  2026-06-25T07:17:00-04:00  |  73.30682373046875    |
+|  2.908885821700096   |  2026-06-25T07:18:00-04:00  |  6.005518436431885    |
+|  36.94336718817552   |  2026-06-25T07:19:00-04:00  |  63.58249282836914    |
+|  0.4066856117375816  |  2026-06-25T07:20:00-04:00  |  2.2849700450897217   |
+|  0.026938070349084832|  2026-06-25T07:21:00-04:00  |  0.08120054006576538  |
+|  0.026072327590857942|  2026-06-25T07:22:00-04:00  |  0.08099077641963959  |
+|  0.026456129387952387|  2026-06-25T07:23:00-04:00  |  0.08222148567438126  |
+|  0.0259915991143013  |  2026-06-25T07:24:00-04:00  |  0.07692830264568329  |
+|  0.09701259426462153 |  2026-06-25T07:25:00-04:00  |  0.5006436109542847   |
++----------------------+-----------------------------+-----------------------+
+----- actividades de escalado (detalle) -----
+Fin: 06/25/2026 07:27:43
+
+==================================================
+=== INTENTO 2: CARGA REFORZADA (3 procesos x 120 hilos = 360 concurrentes) ===
+Inicio: 06/25/2026 07:29:35
+[hora] backend running/pending | CPUavg(ultimo 1min) | scaling
+[09:12:26] running= pending= | CPUavg= | 
+[09:26:40] running=2 pending=0 | CPUavg=0.03357761927569906 | None
+[09:27:24] running=2 pending=0 | CPUavg=0.028823344269767404 | None
+[09:28:08] running=2 pending=0 | CPUavg=0.027288553227360048 | None
+[09:28:53] running=2 pending=0 | CPUavg=0.027549816062673926 | None
+[09:29:37] running=2 pending=0 | CPUavg=0.027549816062673926 | None
+
+==================================================
+=== INTENTO 3 (DEFINITIVO - conexion estable, 4 procesos x 120 hilos = 480 concurrentes) ===
+Nota: intento 2 invalidado por caida de conexion (errores Could not connect).
+Inicio: 06/25/2026 09:29:45
+[hora] backend running/pending | CPUavg(ultimo 1min) | scaling
+[09:30:38] running=2 pending=0 | CPUavg=0.03278034075628966 | None
+[09:30:39] running=2 pending=0 | CPUavg=0.03278034075628966 | None
+[09:31:44] running=2 pending=0 | CPUavg=9.294681532036824 | None
+[09:31:44] running=2 pending=0 | CPUavg=9.294681532036824 | None
+[09:32:32] running=2 pending=0 | CPUavg=15.899977298492256 | None
+[09:33:00] running=2 pending=0 | CPUavg=16.412048816680908 | None
+[09:33:47] running=2 pending=0 | CPUavg=16.412048816680908 | None
+[09:34:13] running=2 pending=0 | CPUavg=15.920482158660889 | None
+[09:35:03] running=2 pending=0 | CPUavg=15.176592071851095 | None
+[09:35:30] running=2 pending=0 | CPUavg=15.176592071851095 | None
+[09:36:28] running=2 pending=0 | CPUavg=20.486439069112144 | None
+[09:36:33] running=2 pending=0 | CPUavg=20.486439069112144 | None
+[09:37:58] running=2 pending=0 | CPUavg=17.16811203956604 | None
+[09:38:04] running=2 pending=0 | CPUavg=17.16811203956604 | None
+[09:38:40] running=2 pending=0 | CPUavg=17.16811203956604 | None
+[09:38:48] running=2 pending=0 | CPUavg=17.721829891204834 | None
+[09:39:24] running=2 pending=0 | CPUavg=17.721829891204834 | None
+[09:39:30] running=2 pending=0 | CPUavg=17.721829891204834 | None
+[09:40:12] running=2 pending=0 | CPUavg=0.6928142797357092 | None
+[09:40:14] running=2 pending=0 | CPUavg=0.6928142797357092 | None
+[09:40:54] running=2 pending=0 | CPUavg=0.05835486952370653 | None
+[09:41:00] running=2 pending=0 | CPUavg=0.05835486952370653 | None
+[09:41:37] running=2 pending=0 | CPUavg=0.05835486952370653 | None
+----- CPU CloudWatch (Average/Maximum) intento 2 -----
+-----------------------------------------------------------------------------
+|                            GetMetricStatistics                            |
++---------------------+-----------------------------+-----------------------+
+|         avg         |            hora             |          max          |
++---------------------+-----------------------------+-----------------------+
+|  0.03278034075628966|  2026-06-25T09:28:00-04:00  |  0.07957125455141068  |
+|  9.294681532036824  |  2026-06-25T09:29:00-04:00  |  55.59945297241211    |
+|  15.899977298492256 |  2026-06-25T09:30:00-04:00  |  36.023658752441406   |
+|  16.412048816680908 |  2026-06-25T09:31:00-04:00  |  45.07549285888672    |
+|  15.920482158660889 |  2026-06-25T09:32:00-04:00  |  28.293933868408207   |
+|  15.176592071851095 |  2026-06-25T09:33:00-04:00  |  23.595014572143555   |
+|  20.486439069112144 |  2026-06-25T09:34:00-04:00  |  32.259864807128906   |
+|  20.150343736012776 |  2026-06-25T09:35:00-04:00  |  26.373710632324222   |
+|  17.16811203956604  |  2026-06-25T09:36:00-04:00  |  22.41020965576172    |
+|  17.721829891204834 |  2026-06-25T09:37:00-04:00  |  29.46108627319336    |
+|  0.6928142797357092 |  2026-06-25T09:38:00-04:00  |  3.9711124897003174   |
+|  0.05835486952370653|  2026-06-25T09:39:00-04:00  |  0.256439208984375    |
++---------------------+-----------------------------+-----------------------+
+----- Actividades de escalado -----
+Fin: 06/25/2026 09:41:45
+[09:42:30] running=2 pending=0 | CPUavg=0.03122580520963917 | None
+[09:43:16] running=2 pending=0 | CPUavg=0.027644229664777715 | None
+[09:44:04] running=2 pending=0 | CPUavg=0.027432921614187457 | None
+[09:44:50] running=2 pending=0 | CPUavg=0.027283685514703393 | None
+[09:45:38] running=2 pending=0 | CPUavg=0.027283685514703393 | None
+[09:46:24] running=2 pending=0 | CPUavg=0.026990519564909242 | None
+----- CPU CloudWatch (intento 3) -----
+------------------------------------------------------------------------------
+|                             GetMetricStatistics                            |
++----------------------+-----------------------------+-----------------------+
+|          avg         |            hora             |          max          |
++----------------------+-----------------------------+-----------------------+
+|  15.176592071851095  |  2026-06-25T09:33:00-04:00  |  23.595014572143555   |
+|  20.486439069112144  |  2026-06-25T09:34:00-04:00  |  32.259864807128906   |
+|  20.150343736012776  |  2026-06-25T09:35:00-04:00  |  26.373710632324222   |
+|  17.16811203956604   |  2026-06-25T09:36:00-04:00  |  22.41020965576172    |
+|  17.721829891204834  |  2026-06-25T09:37:00-04:00  |  29.46108627319336    |
+|  0.6928142797357092  |  2026-06-25T09:38:00-04:00  |  3.9711124897003174   |
+|  0.05835486952370653 |  2026-06-25T09:39:00-04:00  |  0.256439208984375    |
+|  0.03122580520963917 |  2026-06-25T09:40:00-04:00  |  0.09452670067548752  |
+|  0.027644229664777715|  2026-06-25T09:41:00-04:00  |  0.08429297059774399  |
+|  0.027432921614187457|  2026-06-25T09:42:00-04:00  |  0.08343199640512466  |
+|  0.027283685514703393|  2026-06-25T09:43:00-04:00  |  0.08554310351610184  |
+|  0.026990519564909242|  2026-06-25T09:44:00-04:00  |  0.07813826203346252  |
++----------------------+-----------------------------+-----------------------+
+----- Actividades de escalado (intento 3) -----
+Fin: 06/25/2026 09:46:32
+
+==================================================
+=== INTENTO 4: DEMO DEL MECANISMO DE SCALE-OUT (umbral ajustado, con transparencia) ===
+NOTA: la politica de PRODUCCION es CPU 50% (ver ecs/scaling-cpu.json). Como un solo PC
+sostiene ~20-44% de CPU, para DEMOSTRAR el mecanismo se baja TEMPORALMENTE el umbral a 10%,
+se genera carga, se captura el escalado 2->3/4 y al final se RESTAURA a 50%.
+Inicio: 06/25/2026 09:48:55
+Umbral temporal = 10% CPU aplicado.
+Carga: 2x120 hilos por 360s
+[hora] running/pending | CPUavg | ultima actividad de escalado
+[09:49:54] running=2 pending=0 | CPUavg=0.026673171979685627 | None
+[09:50:55] running=2 pending=0 | CPUavg=26.772757949928444 | None
+[09:52:13] running=2 pending=0 | CPUavg=17.075984795888264 | None
+[09:53:40] running=2 pending=0 | CPUavg=15.437718232472738 | None
+[09:54:33] running=2 pending=0 | CPUavg=17.100426514943443 | Successfully set desired count to 4. Waiting for change to be fulfilled by ecs.
+[09:55:18] running=3 pending=0 | CPUavg=14.863975048065186 | Successfully set desired count to 4. Waiting for change to be fulfilled by ecs.
+[09:56:03] running=4 pending=0 | CPUavg=8.179945309956867 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[09:56:50] running=4 pending=0 | CPUavg=2.91907302045729 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[09:57:36] running=4 pending=0 | CPUavg=2.91907302045729 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[09:58:22] running=4 pending=0 | CPUavg=0.047721374197863035 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[09:59:07] running=4 pending=0 | CPUavg=0.0513288799362878 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[09:59:54] running=4 pending=0 | CPUavg=0.04511736835896348 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[10:00:41] running=4 pending=0 | CPUavg=0.04511736835896348 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[10:01:32] running=4 pending=0 | CPUavg=0.04910625711393853 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[10:02:18] running=4 pending=0 | CPUavg=0.04575716352943952 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+[10:03:04] running=4 pending=0 | CPUavg=0.05581834477682908 | Successfully set desired count to 4. Change successfully fulfilled by ecs.
+Umbral RESTAURADO a 50% (produccion).
+----- Actividades de escalado (demo) -----
+------------------------------------------------------------------------------------------
+|                                DescribeScalingActivities                               |
++--------+-------------------------------------------------------------------------------+
+|  desc  |  Setting desired count to 4.                                                  |
+|  estado|  Successfully set desired count to 4. Change successfully fulfilled by ecs.   |
+|  inicio|  2026-06-25T09:54:28.175000-04:00                                             |
++--------+-------------------------------------------------------------------------------+
+Fin: 06/25/2026 10:03:11
