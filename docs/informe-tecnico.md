@@ -4,7 +4,7 @@
 **Asignatura:** Introducción a Herramientas DevOps (ISY1101)
 **Evaluación:** Parcial N°3 — Encargo con Presentación
 **Empresa (caso):** Innovatech Chile
-**Integrantes:** [Integrante 1 – Nombre Apellido] · [Integrante 2 – Nombre Apellido]
+**Integrantes:** Gabriel Molina · Jefferson Rojas
 **Fecha:** Junio 2026
 **Repositorio:** https://github.com/jeffplop/tienda-perritos
 
