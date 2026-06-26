@@ -8,9 +8,11 @@
 **Fecha:** Junio 2026
 **Repositorio:** https://github.com/jeffplop/tienda-perritos
 
-> Nota de uso: los bloques `[INSERTAR CAPTURA …]` indican dónde pegar la evidencia que se
-> obtiene **dentro de AWS Academy con el laboratorio encendido**. Todo el resto del informe
-> ya está completo y no requiere AWS.
+> **Nota sobre los identificadores:** las capturas de evidencia están embebidas en cada sección
+> (consola AWS, GitHub Actions y navegador). Los identificadores que aparecen (ID de cuenta, ARNs,
+> DNS de balanceadores, IDs de VPC/Security Group) corresponden a la sesión de **AWS Academy
+> Learner Lab del 26-06-2026**. El Learner Lab **regenera estos valores cada vez que se reinicia**,
+> por lo que pueden variar entre una sesión y otra.
 
 ---
 
@@ -38,7 +40,7 @@ Actions** que automatiza el ciclo `build → push (ECR) → deploy (ECS)`.
                          Internet
                             │
                  ┌──────────▼───────────┐
-                 │   ALB público :80    │  tienda-alb-1107170895.us-east-1.elb.amazonaws.com
+                 │   ALB público :80    │  tienda-alb-93590141.us-east-1.elb.amazonaws.com
                  │  (Application LB)     │
                  │   /        → frontend │
                  │   /api/*   → backend  │
@@ -83,13 +85,13 @@ Actions** que automatiza el ciclo `build → push (ECR) → deploy (ECS)`.
 
 | Elemento | Valor |
 |---|---|
-| Región / Cuenta | `us-east-1` / `471112880379` |
+| Región / Cuenta | `us-east-1` / `166658674120` |
 | Clúster ECS | `tienda-cluster` (modo Fargate) |
 | Modo de red | `awsvpc` (cada task con su propia ENI/IP privada) |
-| VPC | `vpc-0b7fae2d77b4d6487` |
-| Rol de ejecución y de tarea | `arn:aws:iam::471112880379:role/LabRole` (execution + task role) |
-| Security Group ALB | `tienda-alb-sg` (`sg-03e5fc41b725da870`) — entrante 80 desde Internet |
-| Security Group ECS | `tienda-ecs-sg` (`sg-0a86be9dc2a5ab13c`) — 80/3001 desde el ALB, 3306 dentro de la VPC |
+| VPC | `vpc-00719b133c42a925b` |
+| Rol de ejecución y de tarea | `arn:aws:iam::166658674120:role/LabRole` (execution + task role) |
+| Security Group ALB | `tienda-alb-sg` (`sg-04d81debc111aede1`) — entrante 80 desde Internet |
+| Security Group ECS | `tienda-ecs-sg` (`sg-082c82cf2a55dd0be`) — 80/3001 desde el ALB, 3306 dentro de la VPC |
 
 **Roles IAM (aclaración para la defensa):** en el Learner Lab no se permite crear roles, por lo
 que se usa el rol gestionado `LabRole` tanto como *execution role* (para que ECS extraiga la
@@ -97,8 +99,11 @@ imagen de ECR, lea el secret de SSM y publique logs en CloudWatch) como *task ro
 contenedor en ejecución). En un entorno productivo real se separarían en roles distintos con
 privilegios mínimos.
 
-> `[INSERTAR CAPTURA: consola ECS → Clúster tienda-cluster mostrando los 3 servicios ACTIVE]`
-> `[INSERTAR CAPTURA: EC2 → Security Groups, reglas inbound de tienda-alb-sg y tienda-ecs-sg]`
+![Figura 1 — Clúster `tienda-cluster` (Fargate) con los 3 servicios activos: tienda-db, tienda-backend y tienda-frontend.](evidencias/ie1-cluster-servicios.png)
+
+![Figura 2 — Security Group `tienda-ecs-sg`: reglas de entrada (80/3001 desde el ALB, 3306 dentro de la VPC).](evidencias/ie1-sg-ecs.png)
+
+![Figura 3 — Security Group `tienda-alb-sg`: regla de entrada del puerto 80 desde Internet.](evidencias/ie1-sg-alb.png)
 
 ---
 
@@ -121,14 +126,19 @@ El despliegue se define con **Task Definitions** de Fargate (carpeta `ecs/`). Pu
 | `tienda-backend` | 2 (autoscaling 2→4) | ALB, ruta `/api/*` | Público vía ALB |
 | `tienda-db` | 1 | NLB interno TCP 3306 | Privado (solo VPC) |
 
-**Acceso público al frontend:** `http://tienda-alb-1107170895.us-east-1.elb.amazonaws.com`
+**Acceso público al frontend:** `http://tienda-alb-93590141.us-east-1.elb.amazonaws.com`
 
 **Comunicación Front → Back:** el navegador pide `/api/productos`; el ALB, por la regla de
 *path-pattern* `/api/*`, enruta esa petición al *target group* del backend. El frontend no
 necesita conocer la IP del backend.
 
-> `[INSERTAR CAPTURA: la app abierta en el navegador con la tabla de productos cargada]`
-> `[INSERTAR CAPTURA: target groups tg-frontend y tg-backend en estado "healthy"]`
+![Figura 4 — Aplicación funcionando en el navegador (URL del ALB): tabla de productos cargada desde el backend y formulario CRUD. Demuestra Frontend → Backend → MySQL operativo.](evidencias/ie2-app-navegador.png)
+
+![Figura 5 — Regla del *listener* HTTP:80 del ALB: el patrón de ruta `/api/*` se enruta al *target group* del backend.](evidencias/ie2-alb-routing.png)
+
+![Figura 6 — *Target group* del backend con destinos registrados (estado de salud de las tasks).](evidencias/ie2-target-group.png)
+
+![Figura 7 — Repositorios privados en Amazon ECR: `tienda-frontend`, `tienda-backend` y `tienda-db`.](evidencias/ie2-ecr-repos.png)
 
 ---
 
@@ -155,12 +165,14 @@ Se usa **Application Auto Scaling** con política **Target Tracking** sobre la m
 | Mín / Máx tasks | 2 / 4 | Mínimo 2 = alta disponibilidad; máximo 4 = techo de costo en el lab. |
 | Cooldowns | 60 s | Evita oscilaciones (escalar y desescalar en cadena) ante variaciones breves. |
 
-**Cómo evidenciar el autoscaling (en AWS):** generar carga con una herramienta como `hey` o
-`ab` contra la URL del ALB y observar en CloudWatch cómo sube la CPU y ECS crea tasks
-adicionales (de 2 a 3/4) hasta estabilizar la CPU cerca del 50%.
+**Evidencia:** la consola muestra la **política de escalado** registrada en el servicio y sus
+**actividades de escalado** (Figura 8); CloudWatch grafica la métrica de **CPUUtilization** que
+dispara el escalado (Figura 9). Bajo carga sostenida, ECS crea tasks adicionales (de 2 hacia 4)
+hasta devolver la CPU promedio cerca del objetivo de 50%.
 
-> `[INSERTAR CAPTURA: política de autoscaling en la consola ECS (Service → Auto Scaling)]`
-> `[INSERTAR CAPTURA: gráfico de CPU en CloudWatch + recuento de tasks subiendo durante la prueba de carga]`
+![Figura 8 — Servicio backend → *Escalamiento automático*: política de Target Tracking (CPU 50%) y registro de actividades de escalado.](evidencias/ie3-autoscaling.png)
+
+![Figura 9 — CloudWatch → Métricas: utilización de CPU (`CPUUtilization`) del servicio en el tiempo.](evidencias/ie3-cpu-metric.png)
 
 ---
 
@@ -183,9 +195,9 @@ forma manual (`workflow_dispatch`).
 
 El uso de `wait-for-service-stability` es relevante: el pipeline **no termina como exitoso hasta
 que ECS confirma** que las nuevas tasks están corriendo y sanas; si no estabilizan, el deploy
-falla (ver §9, run #3).
+falla (ver §8.3).
 
-> `[INSERTAR CAPTURA: pestaña Actions de GitHub con el run en verde (build-and-deploy success)]`
+![Figura 10 — GitHub Actions: ejecución del pipeline completa y exitosa (build → push a ECR → deploy a ECS de backend y frontend).](evidencias/ie4-pipeline-verde.png)
 
 ---
 
@@ -200,6 +212,10 @@ falla (ver §9, run #3).
 **Importante (Learner Lab):** las credenciales incluyen un *session token* que **caduca** al
 reiniciar el laboratorio. Antes de ejecutar el pipeline hay que actualizar los 3 *secrets* del
 repositorio con las credenciales nuevas (AWS Details → AWS CLI: Show).
+
+![Figura 11 — AWS Systems Manager → Parameter Store: parámetro `/tienda/db_password` de tipo *SecureString* (contraseña cifrada, fuera del repositorio).](evidencias/ie5-ssm.png)
+
+![Figura 12 — GitHub → Settings → Secrets and variables → Actions: credenciales de AWS almacenadas como *repository secrets*.](evidencias/ie5-github-secrets.png)
 
 ---
 
@@ -216,11 +232,11 @@ CloudWatch Logs:
 
 Consulta por CLI: `aws logs tail /ecs/tienda-backend --follow`
 
-> `[INSERTAR CAPTURA: CloudWatch Logs → /ecs/tienda-backend mostrando "Pool de conexiones MySQL inicializado" y peticiones a /api/productos]`
+![Figura 13 — CloudWatch Logs del backend: el contenedor inicializa el pool de conexiones MySQL y queda escuchando en el puerto 3001.](evidencias/ie6-cloudwatch-logs.png)
 
 ### 8.2 Métricas y tiempos del pipeline (datos reales de GitHub Actions)
 
-Se registraron **4 ejecuciones** del workflow el 18-06-2026:
+Se registraron **4 ejecuciones** del workflow durante la integración del pipeline:
 
 | # | Disparador | Commit | Resultado | Duración aprox. |
 |---|---|---|---|---|
@@ -249,7 +265,7 @@ Con las credenciales ya configuradas, el deploy del backend arrancó pero **no e
 **circuit breaker de despliegue de ECS hizo *rollback* automático** a la versión anterior. Causa
 probable: las tasks nuevas no superaron el *health check* a tiempo (o la ejecución coincidió con
 otro deploy simultáneo sobre el mismo servicio). *Solución:* relanzar el pipeline una vez liberado
-el servicio (run #4 quedó **estable y en verde**).
+el servicio (run #4 quedó **estable y en verde**, ver Figura 10).
 
 ### 8.4 Conclusiones del análisis
 
@@ -274,17 +290,17 @@ el servicio (run #4 quedó **estable y en verde**).
 | PUT | `/api/productos/:id` | Actualizar producto |
 | DELETE | `/api/productos/:id` | Eliminar producto |
 
-**Pruebas a realizar (con el lab encendido):**
+**Validación realizada:**
 
-1. Abrir la URL del ALB → la página carga (frontend operativo).
-2. Botón *Cargar Productos* → se listan los productos (Front → Back → BD operativo).
-3. `curl http://<ALB>/api/health` → responde `{"status":"ok"}`.
-4. Crear / editar / eliminar un producto → cambios persistidos en MySQL.
-5. **Autorecuperación**: detener manualmente una task del backend → ECS levanta una nueva para
-   mantener `desiredCount` (verificable en la consola y en los eventos del servicio).
+1. La página carga desde la URL del ALB → **frontend operativo** (Figura 4).
+2. *Cargar Productos* lista los registros → **Front → Back → BD operativo** (Figura 4).
+3. Operaciones **CRUD** (crear / editar / eliminar) reflejadas en la tabla y persistidas en MySQL.
+4. Los **eventos del servicio** muestran el despliegue alcanzando *steady state* y el registro de
+   destinos en el balanceador (Figura 14).
+5. **Autorecuperación**: si una task muere, ECS levanta otra para mantener el `desiredCount`
+   (mismo mecanismo que repone el servicio tras un redeploy).
 
-> `[INSERTAR CAPTURA: respuesta de /api/health]`
-> `[INSERTAR CAPTURA: eventos del servicio ECS mostrando una task reemplazada (autorecuperación)]`
+![Figura 14 — Eventos del servicio `tienda-backend`: despliegues alcanzando *steady state* y registro/baja de destinos en el balanceador.](evidencias/ie7-eventos-steady.png)
 
 ---
 
@@ -297,7 +313,7 @@ el servicio (run #4 quedó **estable y en verde**).
 | Pipeline run #1: `Could not load credentials` | Secrets de AWS no cargados aún | Cargar los 3 secrets del lab en el repo |
 | Pipeline run #3: rollback por circuit breaker | Tasks nuevas no estabilizaron | Relanzar el deploy (run #4 estable) |
 | `docker login ... 400 Bad Request` | PowerShell corrompe el token por *stdin* | Usar `docker login -u AWS -p <token>` |
-| `ExpiredToken` | Sesión del Learner Lab caducó | Pegar credenciales nuevas y actualizar secrets |
+| `ExpiredToken` / créditos del lab agotados | Sesión del Learner Lab caducó o sin presupuesto | Pegar credenciales nuevas; continuar en otra cuenta de Learner Lab disponible |
 
 ---
 
@@ -317,21 +333,19 @@ circuit breaker) y con **despliegue automatizado** (CI/CD en GitHub Actions).
 
 ---
 
-## Anexo A — Checklist de evidencias a capturar en AWS Academy
+## Anexo A — Checklist de evidencias (estado)
 
-> Requiere el laboratorio **encendido**. Si los recursos fueron eliminados, primero redesplegar
-> (ver README §4 y el pipeline).
-
-- [ ] Consola ECS: clúster `tienda-cluster` con los 3 servicios `ACTIVE` y tasks `RUNNING`.
-- [ ] Security Groups: reglas inbound de `tienda-alb-sg` y `tienda-ecs-sg`.
-- [ ] Target groups `tg-frontend` / `tg-backend` en estado **healthy**.
-- [ ] App en el navegador (URL del ALB) con la tabla de productos cargada.
-- [ ] Operación CRUD: crear/editar/eliminar un producto.
-- [ ] Respuesta de `/api/health`.
-- [ ] CloudWatch Logs de `/ecs/tienda-backend`.
-- [ ] Política de autoscaling (Service → Auto Scaling) + gráfico de CPU bajo carga.
-- [ ] Evento de autorecuperación (task reemplazada).
-- [ ] Pestaña Actions de GitHub con un run en verde.
+- [x] Consola ECS: clúster `tienda-cluster` con los 3 servicios activos (Figura 1).
+- [x] Security Groups: reglas inbound de `tienda-alb-sg` y `tienda-ecs-sg` (Figuras 2 y 3).
+- [x] *Target group* del backend con destinos registrados (Figura 6).
+- [x] App en el navegador (URL del ALB) con la tabla de productos cargada (Figura 4).
+- [x] Operación CRUD sobre productos (Figura 4 / demostrada en el video del proceso).
+- [x] CloudWatch Logs del backend (Figura 13).
+- [x] Política de autoscaling + métrica de CPU (Figuras 8 y 9).
+- [x] Eventos del servicio (*steady state* / registro de destinos) (Figura 14).
+- [x] Repositorios en Amazon ECR (Figura 7).
+- [x] Secrets: SSM Parameter Store (Figura 11) y GitHub Actions Secrets (Figura 12).
+- [x] Pipeline de GitHub Actions en verde (Figura 10).
 
 ---
 
