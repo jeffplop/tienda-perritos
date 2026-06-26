@@ -119,7 +119,7 @@ style_run(r, 16, RGBColor(0xDB, 0xEA, 0xFE), italic=True)
 _, tf = textbox(s, Inches(0.8), Inches(5.25), Inches(11.7), Inches(2.0))
 for txt, sz, col, bd in [
     ("Caso: Innovatech Chile", 20, DARK, True),
-    ("Integrantes: [Integrante 1]  -  [Integrante 2]", 16, GRAY, False),
+    ("Integrantes: Gabriel Molina  -  Jefferson Rojas", 16, GRAY, False),
     ("Junio 2026  -  github.com/jeffplop/tienda-perritos", 14, GRAY, False),
 ]:
     p = tf.add_paragraph(); r = p.add_run(); r.text = txt; style_run(r, sz, col, bold=bd)
@@ -185,7 +185,7 @@ arrow(s, Inches(8.2), Inches(3.1), Inches(9.6), Inches(3.5))    # ALB -> back
 arrow(s, Inches(9.6), Inches(4.5), Inches(9.6), Inches(4.95))   # back -> NLB
 arrow(s, Inches(9.6), Inches(5.75), Inches(9.6), Inches(6.05))  # NLB -> DB
 _, tf = textbox(s, Inches(0.6), Inches(5.2), Inches(6.7), Inches(1.9))
-for txt in ["Region us-east-1  -  Cuenta 471112880379",
+for txt in ["Region us-east-1  -  Cuenta 166658674120",
             "Cluster: tienda-cluster (Fargate)",
             "Imagenes en Amazon ECR",
             "Logs en CloudWatch  -  Secret en SSM"]:
@@ -217,7 +217,7 @@ set_notes(s, "Aca esta el 'por que' que mas preguntan. Dos decisiones clave naci
 s = add_slide(); header_band(s, "Configuracion del cluster", "Redes, Security Groups e IAM (IE1)")
 bullets(s, [
     ("Cluster tienda-cluster, modo Fargate, red awsvpc (cada task con su propia IP).", 0),
-    ("VPC vpc-0b7fae2d77b4d6487.", 0),
+    ("VPC vpc-00719b133c42a925b.", 0),
     ("Security Groups:", 0),
     ("tienda-alb-sg: entrante 80 desde Internet.", 1),
     ("tienda-ecs-sg: 80/3001 solo desde el ALB; 3306 solo dentro de la VPC.", 1),
@@ -241,7 +241,7 @@ bullets(s, [
     ("Variables de entorno del backend: DB_HOST (NLB), DB_USER, DB_NAME, DB_PORT.", 0),
     ("DB_PASSWORD inyectada como secret desde SSM (no en texto plano).", 0),
     ("Balanceo: target groups tg-frontend y tg-backend (ALB), tg-db (NLB).", 0),
-    ("Acceso publico: http://tienda-alb-1107170895.us-east-1.elb.amazonaws.com", 0),
+    ("Acceso publico: http://tienda-alb-93590141.us-east-1.elb.amazonaws.com", 0),
 ], size=19)
 _, tf = textbox(s, Inches(0.7), Inches(6.35), Inches(12), Inches(0.7))
 r = tf.paragraphs[0].add_run(); r.text = "[INSERTAR CAPTURA: la app abierta en el navegador con la tabla de productos]"
