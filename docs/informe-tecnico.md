@@ -1,12 +1,15 @@
 # Informe Técnico — EP3: Orquestación y Automatización en la Nube
-## Tienda de Perritos · AWS ECS Fargate + CI/CD con GitHub Actions
 
-**Asignatura:** Introducción a Herramientas DevOps (ISY1101)
-**Evaluación:** Parcial N°3 — Encargo con Presentación
-**Empresa (caso):** Innovatech Chile
-**Integrantes:** Gabriel Molina · Jefferson Rojas
-**Fecha:** Junio 2026
-**Repositorio:** https://github.com/jeffplop/tienda-perritos
+### Tienda de Perritos · AWS ECS Fargate + CI/CD con GitHub Actions
+
+---
+
+- **Asignatura:** Introducción a Herramientas DevOps (ISY1101)
+- **Evaluación:** Parcial N°3 — Encargo con Presentación
+- **Caso de estudio:** Innovatech Chile
+- **Integrantes:** Gabriel Molina · Jefferson Rojas
+- **Fecha:** Junio 2026
+- **Repositorio:** https://github.com/jeffplop/tienda-perritos
 
 > **Nota sobre los identificadores:** las capturas de evidencia están embebidas en cada sección
 > (consola AWS, GitHub Actions y navegador). Los identificadores que aparecen (ID de cuenta, ARNs,
